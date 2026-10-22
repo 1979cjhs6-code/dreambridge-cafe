@@ -13,11 +13,11 @@
       if(!response.ok)throw new Error('HTTP '+response.status);
       const result=await response.json();
       if(!result||typeof result.ok!=='boolean')throw new Error('Invalid server response');
-      if(!result.ok)throw Object.assign(new Error(typeof result.error==='string'?result.error:'요청을 처리하지 못했습니다.'),{serverResponse:true});
+      if(!result.ok)throw Object.assign(new Error(typeof result.error==='string'?result.error:'요청을 처리하지 못했습니다.'),{serverResponse:true,reconcile:result.reconcile===true});
       return result.data;
     }catch(error){
       if(error.serverResponse)throw error;
-      throw new Error(error.name==='AbortError'?'서버 응답이 지연되었습니다. 저장 결과를 새로고침으로 확인한 뒤 다시 시도해주세요.':'운영 서버에 연결하지 못했습니다. 네트워크 연결을 확인한 뒤 다시 연결해주세요.');
+      throw Object.assign(new Error(error.name==='AbortError'?'서버 응답이 지연되었습니다. 저장 결과를 새로고침으로 확인한 뒤 다시 시도해주세요.':'운영 서버에 연결하지 못했습니다. 네트워크 연결을 확인한 뒤 다시 연결해주세요.'),{networkFailure:true});
     }finally{clearTimeout(timeout);}
   }};
 })();
